@@ -8,6 +8,14 @@ class FirebaseVideoPlayer extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Tutorial Resep'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              _showAddDataDialog(context);
+            },
+          ),
+        ],
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('vt_kuliner').snapshots(),
@@ -121,3 +129,53 @@ class _VideoCardState extends State<VideoCard> {
     super.dispose();
   }
 }
+void _showAddDataDialog(BuildContext context) {
+    String nama = '';
+    String link = '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Tambah Data Video'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: InputDecoration(labelText: 'Nama Video'),
+                onChanged: (value) {
+                  nama = value;
+                },
+              ),
+              TextField(
+                decoration: InputDecoration(labelText: 'Link YouTube'),
+                onChanged: (value) {
+                  link = value;
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text('Batal'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Simpan'),
+              onPressed: () {
+                if (nama.isNotEmpty && link.isNotEmpty) {
+                  FirebaseFirestore.instance.collection('vt_kuliner').add({
+                    'nama': nama,
+                    'link': link,
+                  });
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
